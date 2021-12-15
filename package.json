@@ -1,0 +1,38 @@
+{
+  "name": "cli-org-chart",
+  "version": "1.0.0",
+  "description": "A CLI content management system for a business organizational chart written in Express.js and Node.js.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjamesd/cli-org-chart.git"
+  },
+  "keywords": [
+    "CLI",
+    "content",
+    "management",
+    "system",
+    "business",
+    "organizational",
+    "chart",
+    "Express.js",
+    "Node.js"
+  ],
+  "author": "Mark Drummond",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "asciiart-logo": "^0.2.6",
+    "console.table": "^0.10.0",
+    "express": "^4.17.1",
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.2.5"
+  },
+  "bugs": {
+    "url": "https://github.com/mjamesd/cli-org-chart/issues"
+  },
+  "homepage": "https://github.com/mjamesd/cli-org-chart#readme"
+}
