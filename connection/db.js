@@ -36,28 +36,30 @@ class Db {
 
 
     // R: Read
-    async readDepartments(includeId = false) {
+    async readDepartments(includeId = false, orderBy = "`name` ASC") {
         let queryString = "SELECT ";
         queryString += includeId ? "`id`, " : '';
         queryString += "`name` ";
         queryString += (!includeId) ? "AS `All Departments:` " : '';
-        queryString += "FROM `departments`;";
+        queryString += "FROM `departments` " +
+            "ORDER BY " + orderBy + ";";
         // console.log(queryString);
         return await this.connection.promise().query(queryString);
     }
 
-    async readDepartmentSalaries() {
+    async readDepartmentSalaries(orderBy = "`Department` ASC") {
         const queryString = "SELECT `departments`.`name` AS `Department`, CONCAT('$', " +
             "FORMAT(SUM(`roles`.`salary`), 2)) AS `Budget Utilization` " +
             "FROM `employees` " +
             "LEFT JOIN `roles` ON `employees`.`role_id` = `roles`.`id` " +
             "LEFT JOIN `departments` ON `roles`.`department_id` = `departments`.`id` " +
-            "GROUP BY `departments`.`id`;";
-            // console.log(queryString);
-            return await this.connection.promise().query(queryString);
+            "GROUP BY `departments`.`id` " +
+            "ORDER BY " + orderBy + ";";
+        // console.log(queryString);
+        return await this.connection.promise().query(queryString);
     }
 
-    async readEmployees(includeId = false, where = null, includeManagerInfo = true) {
+    async readEmployees(includeId = false, where = null, includeManagerInfo = true, orderBy = "`Department` ASC, `Last Name` ASC") {
         let queryString = "SELECT ";
         queryString += includeId ? "`employees`.`id`, " : "";
         queryString += "`employees`.`first_name` AS `First Name`, `employees`.`last_name` AS `Last Name`, " +
@@ -74,24 +76,26 @@ class Db {
             "LEFT JOIN `departments` ON `roles`.`department_id` = `departments`.`id` " +
             "LEFT JOIN `employees` `managers` ON `employees`.`manager_id` = `managers`.`id` " +
             "LEFT JOIN `roles` `manager_roles` ON `managers`.`role_id` = `manager_roles`.`id` " +
-            "LEFT JOIN `departments` `manager_departments` ON `manager_roles`.`department_id` = `manager_departments`.`id`";
-        where ? queryString += " WHERE " + where + ";" : ";";
+            "LEFT JOIN `departments` `manager_departments` ON `manager_roles`.`department_id` = `manager_departments`.`id` ";
+        where ? queryString += "WHERE " + where + " " : " ";
+        queryString += "ORDER BY " + orderBy + ";";
         // console.log(queryString);
         return await this.connection.promise().query(queryString);
     }
 
-    async readEmployeesByDepartment(department_id) {
+    async readEmployeesByDepartment(department_id = 1, orderBy = "`employees`.`last_name` ASC") {
         const queryString = "SELECT CONCAT(`employees`.`first_name`, ' ', `employees`.`last_name`) AS `Employee`, " +
-        "`roles`.`title` AS `Title` " +
-        "FROM `employees` " +
-        "LEFT JOIN `roles` ON `employees`.`role_id` = `roles`.`id` " +
-        "LEFT JOIN `departments` ON `roles`.`department_id` = `departments`.`id` " +
-        "WHERE `departments`.`id` = " + department_id + ";";
+            "`roles`.`title` AS `Title` " +
+            "FROM `employees` " +
+            "LEFT JOIN `roles` ON `employees`.`role_id` = `roles`.`id` " +
+            "LEFT JOIN `departments` ON `roles`.`department_id` = `departments`.`id` " +
+            "WHERE `departments`.`id` = " + department_id + " " +
+            "ORDER BY " + orderBy + ";";
         console.log(queryString);
         return await this.connection.promise().query(queryString);
     }
 
-    async readManagers(department_id = null) {
+    async readManagers(department_id = null, orderBy = "`Department` ASC, `managers`.`last_name` ASC") {
         let queryString = "SELECT `managers`.`id`, CONCAT(`managers`.`first_name`, ' ', `managers`.`last_name`) AS `Name`, " +
             "`departments`.`name` as `Department` " +
             "FROM `employees` AS `managers` " +
@@ -101,18 +105,23 @@ class Db {
         if (department_id) {
             queryString += ", `departments`.`id`=" + department_id;
         }
-        queryString += ";";
+        queryString += " ORDER BY " + orderBy + ";";
         // console.log(queryString);
         return await this.connection.promise().query(queryString);
     }
 
-    async readRoles(includeId = false) {
+    async readRoles(includeId = false, orderBy = "`Department` ASC, `roles`.`salary` DESC, `Title` ASC") {
         let queryString = "SELECT ";
         queryString += includeId ? "`roles`.`id` AS `RoleId`, `departments`.`id` AS `DepartmentId`, " : '';
-        queryString += "`departments`.`name` AS `Department`, ";
-        queryString += "`roles`.`title` AS `Title`, CONCAT('$', FORMAT(`roles`.`salary`, 2)) AS `Salary` " +
-            "FROM `roles` " +
-            "JOIN `departments` ON `roles`.`department_id` = `departments`.`id`;";
+        queryString += "`departments`.`name` AS `Department`, `roles`.`title` AS `Title`, ";
+        if (includeId) {
+            queryString += "`roles`.`salary` AS `Salary` ";
+        } else {
+            queryString += "CONCAT('$', FORMAT(`roles`.`salary`, 2)) AS `Salary` ";
+        }
+        queryString += "FROM `roles` " +
+            "JOIN `departments` ON `roles`.`department_id` = `departments`.`id` " +
+            "ORDER BY " + orderBy + ";";
         // console.log(queryString);
         return await this.connection.promise().query(queryString);
     }

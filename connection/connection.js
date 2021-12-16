@@ -15,7 +15,7 @@ const connection = mysql.createConnection(
         password: 'rootrootroot',
         database: 'org_chart_db'
     },
-    console.log(`Connected to the org_chart_db database. 💻🔁💻`)
+    console.log(`Connected to the org_chart_db database.`)
 );
 
 module.exports = connection;
